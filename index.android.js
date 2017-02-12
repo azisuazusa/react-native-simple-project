@@ -1,50 +1,77 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+* Sample React Native App
+* https://github.com/facebook/react-native
+* @flow
+*/
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    Button,
+    Alert,
+    ListView,
+    Navigator
 } from 'react-native';
+import ListViewData from './components/ListViewData';
+import FormData from './components/FormData';
 
 export default class AwesomeProject extends Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.instructions}>
-            Azis Abdul Bachar
-        </Text>
-        <Image
-            style={{width: 300, height: 300}}
-            source={{uri: 'https://scontent.fcgk1-1.fna.fbcdn.net/v/t1.0-9/15073389_909791705817589_3818015644248990576_n.jpg?oh=717b74bf2d4299471fdb7a03cd835e27&oe=5900DEE2'}}
-        />
-        <Text style={styles.instructions}>
-            Batch #2 - Basilischi
-        </Text>
-      </View>
-    );
-  }
+    switchScene(route, navigator) {
+        switch (route.index) {
+            case 0:
+                return <ListViewData
+                            title={route.title}
+                            onAdd={() => {
+                                navigator.push({
+                                    title: 'Add Post',
+                                    index: 1,
+                                });
+                            }}
+                            onEdit={(id) => {
+                                navigator.push({
+                                    title: 'Edit Post',
+                                    index: 2,
+                                    id: id
+                                })
+                            }}
+                        />
+                break;
+            case 1:
+                return <FormData
+                            title={route.title}
+                            onPress={() => {
+                                navigator.pop();
+                            }}
+                            id=''
+                        />
+                break;
+            case 2:
+                return <FormData
+                            title={route.title}
+                            onPress={() => {
+                                navigator.pop();
+                            }}
+                            id={route.id}
+                        />
+                break;
+
+            default:
+
+        }
+    }
+
+    render() {
+        return (
+            <Navigator
+                initialRoute={{title: 'Post', index:0}}
+                renderScene={(route, navigator) =>
+                    this.switchScene(route, navigator)
+                }
+            />
+        );
+    }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  instructions: {
-    fontSize: 25,
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
 AppRegistry.registerComponent('AwesomeProject', () => AwesomeProject);
