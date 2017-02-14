@@ -13,14 +13,22 @@ import GeneralStyle from '../styles/GeneralStyle';
 var FormData = React.createClass({
     getInitialState() {
         return {
-            pTitle: null,
-            pBody: null,
-            pUserId: null
+            pTitle: '',
+            pBody: '',
+            pUserId: '',
+            url: 'https://jsonplaceholder.typicode.com/posts/',
+            method: 'POST',
+            status: 'saved'
         }
     },
 
     componentDidMount() {
         if (this.props.id !== '') {
+            this.setState({
+                url: this.state.url + this.props.id,
+                method: 'PUT',
+                status: 'updated'
+            });
             fetch('https://jsonplaceholder.typicode.com/posts/' + this.props.id, {method: "GET"})
                 .then((response) => response.json())
                 .done((responseData) => {
@@ -50,47 +58,31 @@ var FormData = React.createClass({
     },
 
     render() {
-        let Insert = () => {
+        let Save = () => {
             if (this.validation()) {
                 alert('Please fill in all the fields!');
             } else {
-                fetch('https://jsonplaceholder.typicode.com/posts', {
-                    method: "POST",
-                    data: {
+                fetch(this.state.url, {
+                    method: this.state.method,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
                         title: this.state.pTitle,
                         body: this.state.pBody,
                         userId: this.state.pUserId
-                    }
+                    })
                 })
                 .then((response) => response.json())
                 .done((responseData) => {
                     Alert.alert(
-                        'Alert',
-                        'Data with ID: ' + responseData.id + ' has been saved',
-                        [{text: 'OK', onPress: this.props.onPress}],
-                        {cancelable: false}
-                    );
-                });
-            }
-        }
-
-        let Update = () => {
-            if (this.validation()) {
-                alert('Please fill in all the fields!');
-            } else {
-                fetch('https://jsonplaceholder.typicode.com/posts/' + this.props.id, {
-                    method: "PUT",
-                    data: {
-                        title: this.state.pTitle,
-                        body: this.state.pBody,
-                        userId: this.state.pUserId
-                    }
-                })
-                .then((response) => response.json())
-                .done((responseData) => {
-                    Alert.alert(
-                        'Alert',
-                        'Data with ID: ' + responseData.id + ' has been updated',
+                        'Your data has been successfully ' + this.state.status,
+                        'Data Details: \n\n' +
+                        'ID : ' + responseData.id + '\n\n' +
+                        'Title : ' + responseData.title + '\n\n' +
+                        'Body : ' + responseData.body + '\n\n' +
+                        'User ID : ' + responseData.userId,
                         [{text: 'OK', onPress: this.props.onPress}],
                         {cancelable: false}
                     );
@@ -129,7 +121,7 @@ var FormData = React.createClass({
                         title="Cancel"
                     />
                     <Button
-                        onPress={this.props.id == '' ? Insert : Update}
+                        onPress={Save}
                         color="#6677ff"
                         title="Save"
                     />

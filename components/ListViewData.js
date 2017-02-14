@@ -7,7 +7,8 @@ import {
     TouchableHighlight,
     ListView,
     Alert,
-    Button
+    Button,
+    ScrollView
 } from 'react-native';
 import GeneralStyle from '../styles/GeneralStyle';
 
@@ -35,10 +36,19 @@ var ListViewData = React.createClass ({
         });
     },
 
-    deleteData(rowID) {
-        fetch('https://jsonplaceholder.typicode.com/posts/' + rowID, {method: "DELETE"})
+    deleteData(rowData) {
+        fetch('https://jsonplaceholder.typicode.com/posts/' + rowData.id, {method: "DELETE"})
         .done(() => {
-            alert('Data with ID: ' + rowID + ' has been deleted.');
+            Alert.alert(
+                'Your data has been successfully deleted',
+                'Data Details: \n\n' +
+                'ID : ' + rowData.id + '\n\n' +
+                'Title : ' + rowData.title + '\n\n' +
+                'Body : ' + rowData.body + '\n\n' +
+                'User ID : ' + rowData.userId,
+                [{text: 'OK', onPress: this.props.onPress}],
+                {cancelable: false}
+            );
             this.showAllData();
         });
     },
@@ -57,7 +67,7 @@ var ListViewData = React.createClass ({
 
     pressRow(rowData) {
         Alert.alert(
-            'Post Detail',
+            'Post Details',
             'ID : ' + rowData.id + '\n\n' +
             'Title : ' + rowData.title + '\n\n' +
             'Body : ' + rowData.body + '\n\n' +
@@ -65,7 +75,7 @@ var ListViewData = React.createClass ({
             [
                 {text: 'Cancel', onPress: () => console.log('Cancel')},
                 {text: 'Edit', onPress: () => this.props.onEdit(rowData.id)},
-                {text: 'Delete', onPress: () => this.deleteData(rowData.id)},
+                {text: 'Delete', onPress: () => this.deleteData(rowData)},
             ],
             {cancelable: false}
         );
@@ -82,10 +92,12 @@ var ListViewData = React.createClass ({
                     color="#6677ff"
                     title="Add Post"
                 />
-                <ListView
-                    dataSource={this.state.dataSource}
-                    renderRow={this.renderRow}
-                />
+                <ScrollView style={{marginBottom: 70}}>
+                    <ListView
+                        dataSource={this.state.dataSource}
+                        renderRow={this.renderRow}
+                    />
+                </ScrollView>
             </View>
         );
     }
